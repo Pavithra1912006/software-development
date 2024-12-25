@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Invoice Generator</title>
+</head>
+<body>
+  <style>
+    /* Basic CSS styling for the form and invoice */
+    body {
+      font-family: sans-serif;
+      
+      
+    }
+    form {
+      width: 500px;
+      margin: 0 auto;
+      text-emphasis-color: white;
+    }
+    label {
+      display: block;
+      margin-bottom: 5px;
+    }
+    input[type="text"],
+    input[type="number"] {
+      width: 100%;
+      padding: 5px;
+      margin-bottom: 10px;
+      border: 1px solid #ccc;
+      border-radius: 3px;
+    }
+    button {
+      padding: 10px 20px;
+      background-color: #4c8caf;
+      color: rgb(222, 228, 235);
+      border: none;
+      border-radius: 3px;
+      cursor: pointer;
+    }
+    #invoice {
+      border: 1px solid #0c0b0b;
+      padding: 20px;
+      margin-top: 20px;
+    }
+    #invoice h2 {
+      margin-bottom: 10px;
+    }
+    #invoice table {
+      width: 100%;
+      border-collapse: collapse;
+    }
+    #invoice table,
+    #invoice table th,
+    #invoice table td {
+      border: 1px solid #ccc;
+    }
+    #invoice table th,
+    #invoice table td {
+      padding: 5px;
+    }
+  </style>
+</head>
+<body>
+
+  <center><h1>Invoice Generator</h1></center>
+
+  <form id="invoiceForm">
+    <label for="customerName">Customer Name:</label>
+    <input type="text" id="customerName" required>
+
+    <label for="customerAddress">Customer Address:</label>
+    <textarea id="customerAddress" rows="3" required></textarea>
+
+    <div id="itemsContainer">
+      <h3>Item 1</h3>
+      <label for="itemDescription1">Item Description:</label>
+      <input type="text" id="itemDescription1" required>
+
+      <label for="quantity1">Quantity:</label>
+      <input type="number" id="quantity1" min="1" required>
+
+      <label for="price1">Price per Unit:</label>
+      <input type="number" id="price1" min="0" step="0.01" required>
+    </div>
+
+    <button type="button" id="addItem">Add Item</button>
+
+    <label for="taxRate">Tax Rate (%):</label>
+    <input type="number" id="taxRate" min="0" max="100" required>
+
+    <button type="submit">Generate Invoice</button>
+  </form>
+
+  
+
+  <script>
+    // JavaScript to handle form submission and invoice generation
+    const invoiceForm = document.getElementById('invoiceForm');
+    const invoiceContainer = document.getElementById('invoice');
+    const itemsContainer = document.getElementById('itemsContainer');
+    const addItemButton = document.getElementById('addItem');
+
+    let itemCount = 1;
+
+    addItemButton.addEventListener('click', () => {
+      itemCount++;
+
+      const newItemContainer = document.createElement('div');
+      newItemContainer.innerHTML = `
+        <h3>Item ${itemCount}</h3>
+        <label for="itemDescription${itemCount}">Item Description:</label>
+        <input type="text" id="itemDescription${itemCount}" required>
+
+        <label for="quantity${itemCount}">Quantity:</label>
+        <input type="number" id="quantity${itemCount}" min="1" required>
+
+        <label for="price${itemCount}">Price per Unit:</label>
+        <input type="number" id="price${itemCount}" min="0" step="0.01" required>
+      `;
+
+      itemsContainer.appendChild(newItemContainer);
+    });
+
+    invoiceForm.addEventListener('submit', (event) => {
+      event.preventDefault();
+
+      const customerName = document.getElementById('customerName').value;
+      const customerAddress = document.getElementById('customerAddress').value;
+      const taxRate = parseFloat(document.getElementById('taxRate').value) / 100;
+
+      const items = [];
+      for (let i = 1; i <= itemCount; i++) {
+        const itemDescription = document.getElementById(itemDescription$i).value;
+        const quantity = parseInt(document.getElementById(quantity$i).value);
+        const price = parseFloat(document.getElementById(price$i).value);
+        items.push({ description: itemDescription, quantity: quantity, price: price });
+      }
+
+      let subtotal = 0;
+      for (const item of items) {
+        subtotal += item.quantity * item.price;
+      }
+
+      const taxAmount = subtotal * taxRate;
+      const totalAmount = subtotal + taxAmount;
+
+      // Generate invoice HTML
+      let invoiceHTML = `
+        <h2>Invoice</h2>
+        <p>Customer: ${customerName}</p>
+        <p>Address: ${customerAddress}</p>
+        <table>
+          <thead>
+            <tr>
+              <th>Item Description</th>
+              <th>Quantity</th>
+              <th>Price</th>
+              <th>Total</th>
+            </tr>
+          </thead>
+          <tbody>
+      `;
+
+      for (const item of items) {
+        invoiceHTML += `
+          <tr>
+            <td>${item.description}</td>
+            <td>${item.quantity}</td>
+            <td>$${item.price.toFixed(2)}</td>
+            <td>$${(item.quantity * item.price).toFixed(2)}</td>
+          </tr>
+        `;
+      }
+
+      invoiceHTML += `
+          </tbody>
+        </table>
+        <p>Subtotal: $${subtotal.toFixed(2)}</p>
+        <p>Tax (${taxRate * 100}%): $${taxAmount.toFixed(2)}</p>
+        <p>Total: $${totalAmount.toFixed(2)}</p>
+      `;
+
+      invoiceContainer.innerHTML = invoiceHTML;
+    });
+  </script>
+
+
+</body>
+</html>
